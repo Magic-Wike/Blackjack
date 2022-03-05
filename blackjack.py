@@ -7,9 +7,6 @@ y_responses = ['y', 'yes', 'ya', 'yup', 'send it', 'hit me']
 n_responses = ['n', 'no', 'nope', 'nah']
 quit_commands = ['quit', 'exit', 'x', 'bye']
 
-def win_calc(hand_dict):
-    winners = []
-    losers = []
 
 
 class Deck:
@@ -35,7 +32,9 @@ class Deck:
             random_card = self.cards[random_index]
         return random_card
 
-    
+# def win_calc(dealer_cards, *player_cards):
+
+
 
 class Player:
 
@@ -79,6 +78,12 @@ def command_parse(user_input):
         raw_input = input(user_input)
         if type(raw_input) == int:
             return raw_input
+        elif "What is your name?" in user_input:
+            if raw_input == "":
+                print("Please enter a name!")
+                continue
+            else:
+                 return raw_input
         cleaned = raw_input.strip().lower()
         if cleaned in quit_commands:
             killswitch()
@@ -93,8 +98,9 @@ def command_parse(user_input):
             return "y"
         elif cleaned in n_responses:
             return "n"
-        else:
-            return "Invalid input."
+        else: 
+            print("Invalid input")
+            continue
 
 def get_bet(min=50, max=500):
     while True:
@@ -106,11 +112,12 @@ def get_bet(min=50, max=500):
         elif bet < min:
             print("Table minimum is ${}".format(min))
             continue
-        elif bet < player1.chip_count
+        elif bet > player1.chip_count:
             print("Not enough chips. You currently have ${}".format(player1.chip_count))
             continue
         else:
             return bet
+
 
 
 
@@ -127,7 +134,7 @@ while True:
         while True:
             player_cards = []
             dealer_cards = []
-            players = ["Wike", player1.name]
+            players = [player1.name]
             hand = {}
             bet = get_bet()
             print("{} bets ${}...\n".format(player1.name, bet))
@@ -135,7 +142,9 @@ while True:
             for i in range(2):
                 for player in players:
                     rnd_player_card = deck.deal_card()
+                    deck.cards.remove(rnd_player_card)
                     rnd_dealer_card = deck.deal_card()
+                    deck.cards.remove(rnd_dealer_card)
                     player_cards.append(rnd_player_card)
                     dealer_cards.append(rnd_dealer_card)
                 print("Dealer gives {} a {}...\n".format(player1.name, rnd_player_card))
@@ -146,7 +155,7 @@ while True:
                 hand[player] = player_cards
             print(player_cards)
             print(dealer_cards)
-
+            print(hand)
         
 
 
