@@ -1,5 +1,6 @@
 import random
-from selectors import EpollSelector
+import sys
+import os
 import random_names
 from time import sleep
 
@@ -64,6 +65,13 @@ class CPU_player:
         self.chip_count = chip_count
         self.high_roller = high_roller
 
+userOS = str(sys.platform)
+
+def clearFunc():
+  if "win32" not in userOS:
+    os.system('clear')
+  else:
+    os.system('cls')
 
 def clean_input(string):
     cleaned = string.strip().lower()
@@ -223,7 +231,7 @@ def play_hand(dealer_cards, player_dict, bet):
 # gameplay loop
 
 while True:
-    
+    clearFunc()
     welcome = command_parse("\n\nWelcome! What is your name?: \n")
     player1 = Player(welcome)
     is_ready = command_parse("\nReady to play?\n")
