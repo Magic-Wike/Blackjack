@@ -32,6 +32,7 @@ class Deck:
         for i in range(num_cards):
             random_index = random.randint(1, len(self.cards)-1)
             random_card = self.cards[random_index]
+            self.cards.remove(random_card)
         return random_card        
 
 class Player:
@@ -142,6 +143,7 @@ def sum_cards(card_list):
                 cards_val = sum1
             else: 
                 cards_val = [sum1, sum2]
+                cards_val.sort()
         elif type(card_val) is list and i == 1:
             sum1 = card_val[0] + card_list[0]
             sum2 = card_val[1] + card_list[0]
@@ -151,23 +153,37 @@ def sum_cards(card_list):
                 cards_val = sum1
             else: 
                 cards_val = [sum1, sum2]
+                cards_val.sort()
         else: 
             cards_val = sum(card_list)
     return cards_val
 
-def hit_me(player_val):
-    if type(player_val) is list:
-        while True:
-            print("\nYou have {} / {}".format(player_val[0], player_val[1])
-            player_hit = command_parse("\nWould you like to hit?")
-            if player_hit in y_responses:
-                pass
-            elif player_hit in n_responses:
-                
-            
+# def hit_me(player_val):
+#     if type(player_val) is list:
+#         while True:
+#             print("\nYou have {} / {}".format(player_val[0], player_val[1]))
+#             player_hit = command_parse("\nWould you like to hit? (try: 'hit me', 'double down', 'stand')")
+#             if player_hit in [n_responses, "stay", "stand"]:
+#                 print("\n{} stands.\n")
+#             elif player_hit == ["double", "double_down"]:
+#                 print("Under construction, soz.")
+#                 pass
+#             elif player_hit in [y_responses, "hit", "hit me"]:
+#                 new_card = deck.deal_card()
+#                 new_card_val = get_card_val(new_card)     
+#                 if player_val[1] > 21:
+#                     player_val.pop(1)
+#                 if new_card_val + player_val[0] > 21:
+#                     print("\nYou bust!\n")
+#                     player1.chip_count -= bet
+#                     print('\nYou lose {:.2f}'.format(bet))
+#                 elif new_card_val + player_val[0] < 21 and new_card_val + player_val[1] < 21:
+#                     player_val[0], player_val[1] += new_card_val
+#                     print("\nYou have {} / {}".format(player_val[0], player_val[1]))
+                    
 
-    else:
-        print("You have {}".format(player_val))
+#     else:
+#         print("You have {}".format(player_val))
 
 
 
@@ -227,9 +243,7 @@ while True:
             for i in range(2):
                 for player in players:
                     rnd_player_card = deck.deal_card()
-                    deck.cards.remove(rnd_player_card)
                     rnd_dealer_card = deck.deal_card()
-                    deck.cards.remove(rnd_dealer_card)
                     player_cards.append(rnd_player_card)
                     dealer_cards.append(rnd_dealer_card)
                 print("Dealer gives {} a {}...".format(player1.name, rnd_player_card))
