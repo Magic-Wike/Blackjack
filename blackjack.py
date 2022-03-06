@@ -28,13 +28,9 @@ class Deck:
 
     def deal_card(self, num_cards=1):
         for i in range(num_cards):
-            random_index = random.randint(1, len(self.cards))
+            random_index = random.randint(1, len(self.cards)-1)
             random_card = self.cards[random_index]
-        return random_card
-
-# def win_calc(dealer_cards, *player_cards):
-
-
+        return random_card        
 
 class Player:
 
@@ -48,7 +44,7 @@ class Player:
         self.chip_count += amount
 
     def lose(self, amount):
-        if amount > chip_count:
+        if amount > self.chip_count:
             self.chip_count -= amount
         else:
             self.chip_count = 0
@@ -81,6 +77,9 @@ def command_parse(user_input):
         elif "What is your name?" in user_input:
             if raw_input == "":
                 print("Please enter a name!")
+                continue
+            elif raw_input.isalpha() == False:
+                print("Please use letters only")
                 continue
             else:
                  return raw_input
@@ -118,7 +117,35 @@ def get_bet(min=50, max=500):
         else:
             return bet
 
+def get_card_val(card):
+    card_val = 0
+    for key in deck.card_values.keys():
+        if card.startswith(key):
+            if card.startswith("Ace"):
+                pass
+            card_val = deck.card_values[key]
+    return card_val
 
+
+def win_calc(dealer_cards, player_dict):
+    dealer_card_vals =[]
+    for card in dealer_cards:
+        dealer_card_vals.append(get_card_val(card))
+    dealer_val = sum(dealer_card_vals)
+    print(dealer_val)
+    if dealer_val == 21:
+        print("Dealer has blackjack!")
+    else:
+        for player in player_dict:
+            player_card_vals = []
+            for card in player_dict[player]:
+                player_card_vals.append(get_card_val(card))
+            print(player_card_vals)
+            player_val = sum(player_card_vals)
+            if player == player1.name:
+                print("You have {}".format(player_val))
+            else:
+                pass #bot val assignment
 
 
 while True:
@@ -150,12 +177,12 @@ while True:
                 print("Dealer gives {} a {}...\n".format(player1.name, rnd_player_card))
                 print("Dealer draws a card...")
             print("Dealer shows {}".format(dealer_cards[1]))
-            hand["Dealer"] = dealer_cards
             for player in players:
                 hand[player] = player_cards
             print(player_cards)
             print(dealer_cards)
             print(hand)
+            win_calc(dealer_cards, hand)
         
 
 
