@@ -7,8 +7,8 @@ from time import sleep
 y_responses = ['y', 'yes', 'ya', 'yup', 'send it', 'hit me']
 n_responses = ['n', 'no', 'nope', 'nah']
 quit_commands = ['quit', 'exit', 'x', 'bye']
-hand_commands = ['hit', 'hit me', 'double', 'double down', 'stay', 'stand']
-user_commands = {'chips': 'return current # of player chips'}
+hand_commands = ['hit', 'hit me', 'double', 'double down', 'stay', 'stand', 'split']
+user_commands = {'chips': 'return current # of player chips', 'commands': 'show commands list'}
 
 
 
@@ -81,6 +81,12 @@ def killswitch():
     print("\n\n\n\nGoobye!\n\n\n\n")
     quit()
 
+def print_user_commands():
+    print("\n")
+    for k, v in user_commands.items():
+        print("{}: {}".format(k, v))
+    
+
 def command_parse(user_input):
     while True:
         raw_input = input(user_input)
@@ -104,7 +110,10 @@ def command_parse(user_input):
                 continue
             except NameError:
                 print("Player does not exist. (start a game first)")
-                break
+                continue
+        elif cleaned == "commands":
+                print_user_commands()
+                continue
         elif cleaned in hand_commands:
             return cleaned
         elif cleaned in y_responses:
@@ -118,7 +127,11 @@ def command_parse(user_input):
 def get_bet(min=50, max=500):
     while True:
         raw_bet = input("\nPlace your bets!:\n")
-        bet = int(raw_bet)
+        try:
+            bet = int(raw_bet)
+        except ValueError:
+            print("Must enter a bet. (Can be numbers only)")
+            continue
         if bet > max:
             print("\nTable limit is ${}".format(max))
             continue
@@ -140,30 +153,30 @@ def get_card_val(card):
 
 def sum_cards(card_list):  
     # will return list if multiple values under 21
-    for i in range(len(card_list)):
-        card_val = card_list[i]
-        if type(card_val) is list and i == 0:
-            sum1 = card_val[0] + card_list[1]
-            sum2 = card_val[1] + card_list[1]
-            if sum1 > 21:
-                cards_val = sum2
-            elif sum2 > 21:
-                cards_val = sum1
-            else: 
-                cards_val = [sum1, sum2]
-                cards_val.sort()
-        elif type(card_val) is list and i == 1:
-            sum1 = card_val[0] + card_list[0]
-            sum2 = card_val[1] + card_list[0]
-            if sum1 > 21:
-                cards_val = sum2
-            elif sum2 > 21:
-                cards_val = sum1
-            else: 
-                cards_val = [sum1, sum2]
-                cards_val.sort()
+    if type(card_list[0]) is list:
+        ace = card_list[0]
+        sum1 = ace[0] + card_list[1]
+        sum2 = ace[1] + card_list[1]
+        if sum1 > 21:
+            cards_val = sum2
+        elif sum2 > 21:
+            cards_val = sum1
         else: 
-            cards_val = sum(card_list)
+            cards_val = [sum1, sum2]
+            cards_val.sort() 
+    elif type(card_list[1]) is list:
+        ace = card_list[1]
+        sum1 = ace[0] + card_list[0]
+        sum2 = ace[1] + card_list[0]
+        if sum1 > 21:
+            cards_val = sum2
+        elif sum2 > 21:
+            cards_val = sum1
+        else: 
+            cards_val = [sum1, sum2]
+            cards_val.sort() 
+    else:
+        cards_val = sum(card_list)
     return cards_val
 
 # def hit_me(player_val):
@@ -200,8 +213,18 @@ def play_hand(dealer_cards, player_dict, bet):
         player_card_vals = []
         for card in player_dict[player]:
             player_card_vals.append(get_card_val(card))
+    print("player_card_vals:", player_card_vals)
     player_val = sum_cards(player_card_vals)
-    if 21 in player_val or player_val == 21:
+    print("player_val:", player_val)
+    try:
+        if 21 in player_val:
+            print("\nYou have blackjack!")
+            bj_win = bet * 1.5
+            print("\nYou win ${:.2f}".format(bj_win))
+            player1.chip_count += bj_win 
+    except:
+        pass
+    if player_val == 21:
         print("\nYou have blackjack!")
         bj_win = bet * 1.5
         print("\nYou win ${:.2f}".format(bj_win))
@@ -210,7 +233,9 @@ def play_hand(dealer_cards, player_dict, bet):
     for card in dealer_cards:
         card_val = get_card_val(card)
         dealer_card_vals.append(card_val)
+    print("dealer_card_vals:", dealer_card_vals)
     dealer_val = sum_cards(dealer_card_vals)
+    print("dealer_val", dealer_val)
     print("\n\nDealer checking for 21...\n")
     sleep(2)
     if type(dealer_val) is list and 21 in dealer_val:
@@ -259,8 +284,8 @@ while True:
             print("\nDealer shows {}".format(dealer_cards[1]))
             for player in players:
                 hand[player] = player_cards
-            print(dealer_cards)
-            print(hand)
+            print("dealer_cards:", dealer_cards)
+            print("plauer_cards:", player_cards)
             play_hand(dealer_cards, hand, bet)
 
             # end loop
