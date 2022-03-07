@@ -266,8 +266,13 @@ def play_hand(dealer_cards, player_dict, bet):
                 # add face up or down function later?
                 pass
             elif player_hit in ['stay', 'stand', n_responses]:
-                print('\nWike stands with {}.'.format(player_val))
-                player_stand = True
+                if type(player_val) is list:
+                    final_player_val = max(player_val)
+                    player_stand = True
+                else:
+                    print('\nWike stands with {}.'.format(player_val))
+                    final_player_val = player_val
+                    player_stand = True
             elif player_hit in ['hit', 'hit me', y_responses]:
                 final_player_val = hit_me(player_cards, player_card_vals, player_val)
                 if final_player_val > 21:
@@ -277,7 +282,8 @@ def play_hand(dealer_cards, player_dict, bet):
             else:
                 print('\nInvalid input.')
                 continue
-
+        # dealer hit me
+        # calc winner
 
 def hit_me(player_cards, player_card_vals, player_val):
     print("\nDealing card...")
