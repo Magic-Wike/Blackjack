@@ -44,9 +44,7 @@
 # print(get_card_val("Ace of Diamonds"))
  
 
-string = "Two of Hearts"
+tuple1 = (12, "test")
 
-split = string.split(maxsplit=1)
-split_str = str(split[0])
-print(split_str)
+print(type(tuple1))
 
