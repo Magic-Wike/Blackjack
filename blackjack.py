@@ -321,7 +321,43 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False):
             print("You have {} / {}".format(player_val[0]),player_val[1])
             if double_down == True:
                 return player_val
-            else:    
+            else:
+                while True:    
+                    hit_again = command_parse("\nWould you like to hit again?\n")
+                    if hit_again in ['hit me', 'hit', y_responses]:
+                        hit_me(player_cards, player_card_vals, player_val)
+                    elif hit_again in ['stay', 'stand', n_responses]:
+                        print("\n{} stands with {}.".format(player1.name, player_val))
+                        return player_val
+                    else:
+                        print("Invalid input.")
+                        continue
+        elif player_val[1] > 21:
+            new_player_val = player_val[0]
+            print("\nYou have {}".format(new_player_val))
+            if double_down == True:
+                return new_player_val
+            else:
+                while True:
+                    hit_again = command_parse("\nnWould you like to hit again?\n")
+                    if hit_again in ['hit me', 'hit', y_responses]:
+                        hit_me(player_cards, player_card_vals, player_val)
+                    elif hit_again in ['stay', 'stand', n_responses]:
+                        print("\n{} stands with {}.".format(player1.name, player_val))
+                        return new_player_val    
+                    else:
+                        print("Invalid input.")
+                        continue
+    # if ace and another card - 
+    elif type(player_val) is list and type(new_val) is int:
+        player_val[0] += new_val
+        player_val[1] += new_val
+        if 21 in player_val:
+            print("\n21!!! You win!")
+            return "Win"
+        elif player_val[0] < 21 and player_val[1] < 21:
+            while True:
+                print("You have {} / {}".format(player_val[0]),player_val[1])
                 hit_again = command_parse("\nWould you like to hit again?\n")
                 if hit_again in ['hit me', 'hit', y_responses]:
                     hit_me(player_cards, player_card_vals, player_val)
@@ -333,51 +369,19 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False):
                     continue
         elif player_val[1] > 21:
             new_player_val = player_val[0]
-            print("\nYou have {}".format(new_player_val))
             if double_down == True:
                 return new_player_val
             else:
-                hit_again = command_parse("\nnWould you like to hit again?\n")
-                if hit_again in ['hit me', 'hit', y_responses]:
-                    hit_me(player_cards, player_card_vals, player_val)
-                elif hit_again in ['stay', 'stand', n_responses]:
-                    print("\n{} stands with {}.".format(player1.name, player_val))
-                    return new_player_val    
-                else:
-                    print("Invalid input.")
-                    continue    
-    # if ace and another card - 
-    elif type(player_val) is list and type(new_val) is int:
-        player_val[0] += new_val
-        player_val[1] += new_val
-        if 21 in player_val:
-            print("\n21!!! You win!")
-            return "Win"
-        elif player_val[0] < 21 and player_val[1] < 21:
-            print("You have {} / {}".format(player_val[0]),player_val[1])
-            hit_again = command_parse("\nWould you like to hit again?\n")
-            if hit_again in ['hit me', 'hit', y_responses]:
-                hit_me(player_cards, player_card_vals, player_val)
-            elif hit_again in ['stay', 'stand', n_responses]:
-                print("\n{} stands with {}.".format(player1.name, player_val))
-                return player_val
-            else:
-                print("Invalid input.")
-                continue
-        elif player_val[1] > 21:
-            new_player_val = player_val[0]
-            if double_down == True:
-                return new_player_val
-            else:
-                hit_again = command_parse("\nnWould you like to hit again?\n")
-                if hit_again in ['hit me', 'hit', y_responses]:
-                    hit_me(player_cards, player_card_vals, player_val)
-                elif hit_again in ['stay', 'stand', n_responses]:
-                    print("\n{} stands with {}.".format(player1.name, player_val))
-                    return new_player_val  
-                else:
-                    print("Invalid input.")
-                    continue
+                while True:
+                    hit_again = command_parse("\nnWould you like to hit again?\n")
+                    if hit_again in ['hit me', 'hit', y_responses]:
+                        hit_me(player_cards, player_card_vals, player_val)
+                    elif hit_again in ['stay', 'stand', n_responses]:
+                        print("\n{} stands with {}.".format(player1.name, player_val))
+                        return new_player_val  
+                    else:
+                        print("Invalid input.")
+                        continue
     # no aces - stable
     else:
         player_val += new_val
@@ -391,15 +395,16 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False):
             if double_down == True:
                 return player_val
             else:
-                hit_again = command_parse("\nWould you like to hit again?\n")
-                if hit_again in ['hit me', 'hit', y_responses]:
-                    hit_me(player_cards, player_card_vals, player_val)
-                elif hit_again in ['stay', 'stand', n_responses]:
-                    print("\n{} stands with {}.".format(player1.name, player_val))
-                    return player_val
-                else:
-                    print("Invalid input.")
-                    continue
+                while True:
+                    hit_again = command_parse("\nWould you like to hit again?\n")
+                    if hit_again in ['hit me', 'hit', y_responses]:
+                        hit_me(player_cards, player_card_vals, player_val)
+                    elif hit_again in ['stay', 'stand', n_responses]:
+                        print("\n{} stands with {}.".format(player1.name, player_val))
+                        return player_val
+                    else:
+                        print("Invalid input.")
+                        continue
 
       
             
