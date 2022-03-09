@@ -44,8 +44,7 @@
 # print(get_card_val("Ace of Diamonds"))
  
 
-number = 17
+def ret_str():
+    return "Test"
 
-for i, val in enumerate(number):
-    pass
-
+print(ret_str())
