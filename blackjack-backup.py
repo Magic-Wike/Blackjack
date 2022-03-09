@@ -145,7 +145,7 @@ def get_bet(min=50, max=500):
                 print("\nNo previous bet.")
                 continue
             else:
-                if player1.last_bet <= player1.chip_count: 
+                if player1.last_bet < player1.chip_count: 
                     bet = player1.last_bet
                     player1.chip_count -= bet
                     return bet
@@ -164,7 +164,7 @@ def get_bet(min=50, max=500):
             elif bet < min:
                 print("\nTable minimum is ${}".format(min))
                 continue
-            elif bet >= player1.chip_count:
+            elif bet > player1.chip_count:
                 print("\nNot enough chips. You currently have ${}".format(player1.chip_count))
                 continue
             else:
@@ -194,8 +194,7 @@ def sum_cards(card_list):
             card1.pop(1) 
             cards_val = 2
         else:
-            sum1 = card1[0] + card2[0]
-            sum2 = card1[1] + card2[1]
+            sum1, sum2 = card1[0] + card2[0], card1[1] + card2[1]
             if sum2 > 21:
                 cards_val = sum1
             elif sum1 > 21:
@@ -204,8 +203,7 @@ def sum_cards(card_list):
                 cards_val = [sum1, sum2]
                 cards_val.sort()
     elif type(card1) is list and type(card2) is int:
-        sum1 = card1[0] + card2
-        sum2 = card1[1] + card2
+        sum1, sum2 = card1[0] + card2, card1[1] + card2
         if sum1 > 21:
             cards_val = sum2
         elif sum2 > 21:
@@ -214,8 +212,7 @@ def sum_cards(card_list):
             cards_val = [sum1, sum2]
             cards_val.sort() 
     elif type(card1) is int and type(card2) is list:
-        sum1 = card1 + card2[0]
-        sum2 = card1 + card2[1]
+        sum1, sum2 = card1 + card2[0], card1 + card2[1]
         if sum1 > 21:
             cards_val = sum2
         elif sum2 > 21:
@@ -343,6 +340,7 @@ def play_hand(dealer_cards, player_dict, bet):
                     final_player_val = max(player_val)
                     return final_player_val
                 else:
+                    print('\nWike stands with {}.'.format(player_val))
                     final_player_val = player_val
                     print("\n{} stands with {}".format(player1.name, final_player_val))
                     return final_player_val
@@ -404,48 +402,100 @@ def ask_hit_again(player_card_vals, player_cards, player_val):
         if hit_again in ['hit me', 'hit', 'h'] or hit_again in y_responses:
             hit_me(player_cards, player_card_vals, player_val)
         elif hit_again in ['stay', 'stand', 's'] or hit_again in n_responses:
-            if type(player_val) is list:
-                final_player_val = max(player_val)
-            else:
-                final_player_val = player_val
-            print("\n{} stands with {}.".format(player1.name, final_player_val))
-            return final_player_val
+            print("\n{} stands with {}.".format(player1.name, player_val))
+            return player_val
         else:
             print("Invalid input.")
             continue
     
-# will return "Win", "Bust" or final_player_val
+
 def hit_me(player_cards, player_card_vals, player_val, double_down=False):
-    while True:
-        print("\nDealing card...")
-        sleep(.5)
-        new_card = deck.deal_card()
-        player_cards.append(new_card)
-        new_val = get_card_val(new_card)
-        player_card_vals.append(new_val)
-        print("Dealer gives {} a {}".format(player1.name, new_card)), sleep(.2)
-        new_player_val = sum_cards(player_card_vals)
-        try:
-            if 21 in player_val:
-                print("\n21!!! You win!")
-                return "Win"
-        except:
-            if player_val == 21:
-                print("\n21!!! You win!"), sleep(.5)
-                return "Win"
-        if new_player_val > 21:
-            print("\nYou bust! Sorry!"), sleep(.5)
-            return "Bust"
-        else:    
-            try:
-                print("\You have {}/{}.".format(new_player_val[0], new_player_val[1]))
-            except:
-                print("\nYou have {}".format(new_player_val))
+    print("\nDealing card...")
+    sleep(.5)
+    new_card = deck.deal_card()
+    player_cards.append(new_card)
+    new_val = get_card_val(new_card)
+    player_card_vals.append(new_val)
+    # if two aces
+    print("Dealer gives {} a {}".format(player1.name, new_card)), sleep(.2)
+    if type(player_val) is list and type(new_val) is list:
+        player_val[0] += new_val[0]
+        player_val[1] += new_val[1]
+        if player_val[1] > 21:
+            new_player_val = player_val[0]
+            print("\nYou have {}".format(new_player_val))
             if double_down == True:
                 return new_player_val
             else:
                 ask_hit_again(player_card_vals, player_cards, new_player_val)
+        elif 21 in player_val:
+            print("\n21!!! You win!")
+            return "Win"
+        elif player_val[0] < 21 and player_val[1] < 21:
+            print("\nYou have {} / {}".format(player_val[0]),player_val[1])
+            if double_down == True:
+                return player_val
+            else:
+                ask_hit_again(player_card_vals, player_cards, player_val)
+
+    # if ace and another card - 
+    elif type(player_val) is list and type(new_val) is int:
+        player_val[0] += new_val
+        player_val[1] += new_val
+        if 21 in player_val:
+            print("\nDealer gives {} a {}".format(player1.name, new_card))
+            print("\n21!!! You win!")
+            return "Win"
+        elif player_val[0] < 21 and player_val[1] < 21:
+            if double_down == True:
+                return player_val
+            else:
+                ask_hit_again(player_card_vals, player_cards, player_val)
+        elif player_val[1] > 21:
+            new_player_val = player_val[0]
+            if double_down == True:
                 return new_player_val
+            else:
+                print("\nYou have {}.".format(player_val))
+                ask_hit_again(player_card_vals, player_cards, new_player_val)
+    elif type(player_val) is int and type(new_val) is list:
+        new_player_val = [(player_val+new_val[0]), (player_val+new_val[1])]
+        if 21 in new_player_val:
+            print("\nDealer gives {} a {}".format(player1.name, new_card))
+            print("\n21!!! You win!")
+            return "Win"
+        elif new_player_val[0] < 21 and new_player_val[1] < 21:
+            if double_down == True:
+                return player_val
+            else:
+                ask_hit_again(player_card_vals, player_cards, player_val)
+        elif new_player_val[1] > 21:
+            new_player_val.pop(1)
+            if double_down == True:
+                return new_player_val
+            else:
+                ask_hit_again(player_card_vals, player_cards, new_player_val) 
+    # no aces - stable
+    else:
+        player_val += new_val
+        print("\nDealer gives {} a {}".format(player1.name, new_card))
+        if player_val == 21:
+            print("\n21!!! You win!")
+            return "Win"
+        elif player_val > 21:
+            print("\nYou have {}. You bust!".format(player_val))
+            print("Did not reach play_hand")
+            return "Bust"
+        else:
+            print_player_cards(player_cards)
+            print("\nYou have {}".format(player_val))
+            if double_down == True:
+                return player_val
+            else:
+                print("Wildcard bitch!")
+                ask_hit_again(player_card_vals, player_cards, player_val)
+             
+
 def welcome_msg():
     sleep(.5)
     print("""\n
