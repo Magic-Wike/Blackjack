@@ -44,7 +44,8 @@
 # print(get_card_val("Ace of Diamonds"))
  
 
-tuple1 = (12, "test")
+number = 17
 
-print(type(tuple1))
+for i, val in enumerate(number):
+    pass
 
