@@ -43,8 +43,6 @@
 # print(get_card_val("Seven of Diamonds"))
 # print(get_card_val("Ace of Diamonds"))
  
-
-def ret_str():
-    return "Test"
-
-print(ret_str())
+nums = [10, 8]
+nums.sort()
+print(nums)
