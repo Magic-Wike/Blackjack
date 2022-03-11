@@ -134,8 +134,8 @@ def command_parse(user_input):
 
 def get_bet(min=50, max=500):
     while True:
-        raw_bet = input("\nPlace your bets!:\n")
-        clearFunc()
+        raw_bet = input("\nPlace your bets! (try: 'rebet' / 'r'):\n")
+    #    clearFunc()
         if raw_bet in quit_commands:
             killswitch()
         elif raw_bet == "chips":
@@ -186,17 +186,16 @@ def get_card_val(card, get_name=False):
                 return card_val
     
 
-def sum_cards(card_list, player_val=0):  
+def sum_cards(card_list, player_val=0, dealer=False):  
     # will return list if multiple values under 21
     print("Card list", card_list)
-    print("player_val", player_val)
     ace = [[1, 11], [11, 1]]
     for card in card_list:
         try:
             if ace in card:
                 card.sort()
         except:
-            pass
+            continue
     if len(card_list) > 2:
         new_card_list = [player_val]
         new_card_list.append(card_list[-1])
@@ -234,6 +233,7 @@ def sum_cards(card_list, player_val=0):
             cards_val = sum1
         elif sum1 == 21:
             cards_val = sum1
+        
         else: 
             cards_val = [sum1, sum2]
             cards_val.sort() 
@@ -258,7 +258,7 @@ def player_win(bet, is_bj=False):
     if is_bj == True:
         print("\nYou have blackjack!")
         bj_win = bet + (bet * 1.5)
-        print("\nYou win ${:.2f}".format(bj_win))
+        print("\nYou win ${:.2f}!".format(bj_win))
         player1.chip_count += bj_win
     else:
         reg_win = bet * 2
@@ -285,6 +285,7 @@ def play_hand(dealer_cards, player_dict, bet):
     try:
         if 21 in player_val:
             player_win(bet, is_bj=True)
+
     except:
         pass
     if player_val == 21:
@@ -312,110 +313,111 @@ def play_hand(dealer_cards, player_dict, bet):
         print("\nNobody home!\n")
         print("\nDealer shows: {}".format(dealer_cards[1]))
         # blackjacks handled. accept player inputs for hit, stand, etc
-        try:
-            print("You have {} / {}".format(player_val[0], player_val[1]))
-        except:
-            print("You have {}".format(player_val))
-            pass 
         while True:
-            player_hit = command_parse("\nWould you like to hit? (try: 'hit me', 'double down', 'stand')\n")
-            clearFunc()
-            # split command - test if values match, if so create new hand
-            if player_hit == 'split':
-                print("\nSplit command under construction. Soz.")
-                continue
+            if player_val == 21 or player_val == [11, 21]:
+                break
+            else:
+                try:
+                    print("You have {} / {}".format(player_val[0], player_val[1]))
+                except:
+                    print("You have {}".format(player_val))
+                player_hit = command_parse("\nWould you like to hit? (try: 'hit me', 'double down', 'stand')\n")
+            #    clearFunc()
+                # split command - test if values match, if so create new hand
+                if player_hit == 'split':
+                    print("\nSplit command under construction. Soz.")
+                    continue
 
-                # this code is fine, but need to recursively call play_hand function, but as is it will overwrite a number of variables (i think)
-                # moving on to core functions for now, will revisit
+                    # this code is fine, but need to recursively call play_hand function, but as is it will overwrite a number of variables (i think)
+                    # moving on to core functions for now, will revisit
 
-                # if player_card_vals[0] != player_card_vals[1]:
-                #     print("\nCards must be same value to split!\n")
-                #     continue
-                # else:
-                #     print("\nSplitting {}'s!".format(get_card_val(player_cards[0], True)))
-                #     sleep(.02)
-                #     total_bet += bet
-                #     player1.chip_count -= bet
-                #     print("\n{} bets another ${}".format(player1.name, bet))
-                #     split_card, split_cards = player_cards.pop(-1), [split_card]
-                #     split_player_val, split_vals = player_card_vals.pop(-1), [split_player_val]
-                #     print("\nFirst card coming out...")
-                #     sleep(.02)
-                #     print("Dealer gives {} a {}".format(player1.name, new_card))
-                #     new_card, new_card_val = deck.deal_card(), get_card_val(new_card)
-                #     split_cards.append(new_card), split_vals.append(new_card_val)
-                #     split_val = sum_cards(split_cards)
-                #     print("You have {}.".format(player_val)), sleep(.02)
-            # double down command 
-            elif player_hit in ['double', 'double down', 'd']:
-                total_bet += bet
-                # add face up or down function later?
-                print("\n{} bets another ${}.".format(player1.name, bet))
-                sleep(.05)
-                if player_val == 12:
-                    print("\nDoubling hard 12! May god have mercy on your soul.")
-                else:
-                    print("\nDealing one more card! Good luck...")
-                final_player_val = hit_me(player_cards, player_card_vals, player_val, True)
-                # BUG: something wrong here, loop ends when doubling an ace value pair
-                if final_player_val in ["Bust", "Win"]:
+                    # if player_card_vals[0] != player_card_vals[1]:
+                    #     print("\nCards must be same value to split!\n")
+                    #     continue
+                    # else:
+                    #     print("\nSplitting {}'s!".format(get_card_val(player_cards[0], True)))
+                    #     sleep(.02)
+                    #     total_bet += bet
+                    #     player1.chip_count -= bet
+                    #     print("\n{} bets another ${}".format(player1.name, bet))
+                    #     split_card, split_cards = player_cards.pop(-1), [split_card]
+                    #     split_player_val, split_vals = player_card_vals.pop(-1), [split_player_val]
+                    #     print("\nFirst card coming out...")
+                    #     sleep(.02)
+                    #     print("Dealer gives {} a {}".format(player1.name, new_card))
+                    #     new_card, new_card_val = deck.deal_card(), get_card_val(new_card)
+                    #     split_cards.append(new_card), split_vals.append(new_card_val)
+                    #     split_val = sum_cards(split_cards)
+                    #     print("You have {}.".format(player_val)), sleep(.02)
+                # double down command 
+                elif player_hit in ['double', 'double down', 'd']:
+                    total_bet += bet
+                    # add face up or down function later?
+                    print("\n{} bets another ${}.".format(player1.name, bet))
+                    sleep(.05)
+                    if player_val == 12:
+                        print("\nDoubling hard 12! May god have mercy on your soul.")
+                    else:
+                        print("\nDealing one more card! Good luck...")
+                    final_player_val = hit_me(player_cards, player_card_vals, player_val, True)
+                    # BUG: something wrong here, loop ends when doubling an ace value pair
+                    if final_player_val in ["Bust", "Win"]:
+                        if final_player_val == "Win":
+                            player_win(total_bet)  
+
+                elif player_hit in ['stay', 'stand', 's'] or player_hit in n_responses:
+                    if type(player_val) is list:
+                        final_player_val = max(player_val)
+                        print("\n{} stands with {}".format(player1.name, final_player_val))
+                    else:
+                        final_player_val = player_val
+                        print("\n{} stands with {}".format(player1.name, final_player_val))
+                elif player_hit in ['hit', 'hit me', 'h'] or player_hit in y_responses:
+                    final_player_val = hit_me(player_cards, player_card_vals, player_val)
                     if final_player_val == "Win":
-                        player_win(total_bet)  
-
-            elif player_hit in ['stay', 'stand', 's'] or player_hit in n_responses:
-                if type(player_val) is list:
-                    final_player_val = max(player_val)
-                    pass
+                        print("Reached play_hand")
+                        player_win(total_bet)   
+                        break
+                    elif final_player_val == "Bust":  
+                        print("\nYou lose ${}.".format(total_bet))
+                        break
                 else:
-                    final_player_val = player_val
-                    print("\n{} stands with {}".format(player1.name, final_player_val))
-                    pass
-            elif player_hit in ['hit', 'hit me', 'h'] or player_hit in y_responses:
-                final_player_val = hit_me(player_cards, player_card_vals, player_val)
-                if final_player_val == "Win":
-                    print("Reached play_hand")
-                    player_win(total_bet)   
-                    pass
-                elif final_player_val == "Bust":  
-                    print("Reached play_hand")
-                    pass
-                else:
-                    pass
-            else:
-                print('\nInvalid input.')
-                continue
-        
-            final_dealer_val = dealer_hand(dealer_cards, dealer_card_vals)
-            if final_dealer_val == "Dealer Bust":
-                player_win(total_bet)
-                sleep(.5)
-                break
-            elif final_dealer_val == "Dealer Win":
-                print("You lose ${}. Better luck next time!".format(total_bet))
-                sleep(.5)
-                break
-            elif final_player_val in ["Win", "Bust"]:
-                break
-            else:
-                winner = calc_winner(final_dealer_val , final_player_val)
-                if winner == "Dealer Win":
-                    sleep(1)
-                    print("\nDealer wins with {}. You lose ${}.".format(final_dealer_val, total_bet)), sleep(.5)
-                elif winner == "Player Win":
-                    sleep(1)
+                    print('\nInvalid input.')
+                    continue
+            
+                final_dealer_val = dealer_hand(dealer_cards, dealer_card_vals)
+                if final_player_val in ["Win", "Bust"]:
+                    break
+                elif final_dealer_val == "Dealer Bust":
                     player_win(total_bet)
-                    # print("\n{} wins with {}! You win ${}!".format(player1.name, final_player_val, total_bet)), sleep(.5)
-                elif winner == "Push":
-                    sleep(1)
-                    print("\nPush! You get back your original bet of ${}".format(bet)), sleep(.5)
-                    player1.chip_count += bet
+                    sleep(.5)
+                    break
+                elif final_dealer_val == "Dealer Win":
+                    print("You lose ${}. Better luck next time!".format(total_bet))
+                    sleep(.5)
+                    break
                 else:
-                    print("\nSomething be broke")
-                break
+                    winner = calc_winner(final_dealer_val , final_player_val)
+                    if winner == "Dealer Win":
+                        sleep(1)
+                        print("\nDealer wins with {}. You lose ${}.".format(final_dealer_val, total_bet)), sleep(.5)
+                    elif winner == "Player Win":
+                        sleep(1)
+                        player_win(total_bet)
+                        # print("\n{} wins with {}! You win ${}!".format(player1.name, final_player_val, total_bet)), sleep(.5)
+                    elif winner == "Push":
+                        sleep(1)
+                        print("\nPush! You get back your original bet of ${}".format(bet)), sleep(.5)
+                        player1.chip_count += bet
+                    else:
+                        print("\nSomething be broke")
+                    break
                 
 
 # bed time -- so far should be good
 def calc_winner(final_dealer_val, final_player_val):
+    print("Dealer", final_dealer_val)
+    print("Player", final_player_val)
     if final_player_val == final_dealer_val:
         return "Push"
     elif final_player_val > final_dealer_val:
@@ -427,58 +429,78 @@ def calc_winner(final_dealer_val, final_player_val):
 def dealer_hand(dealer_cards, dealer_card_vals):
     print("\nDealer's flips second card..."), sleep(.5)
     new_dealer_val = sum_cards(dealer_card_vals)
-    # if not type(dealer_val) is list:
-    #     dealer_display_val = 'Dealer has %s' % dealer_val
-    # else:
-    #     dealer_display_val = 'Dealer has %s / %s' % (dealer_val[0], dealer_val[1])
-    # print("\nDealer flips over {}. ".format(dealer_cards[0], dealer_display_val))
-    sleep(.2)
-    while new_dealer_val < 17:
-        new_card = deck.deal_card()
-        new_val = get_card_val(new_card)
-        dealer_cards.append(new_card)
-        dealer_card_vals.append(new_val)
-        print("\nDealer draws a {}.".format(new_card)), sleep(.5)
-        new_dealer_val = sum_cards(dealer_card_vals, new_dealer_val)
+    try:
+        if new_dealer_val > 17:
+            print("\nDealer stands with {}".format(new_dealer_val))
+            sleep(.5)
+            return new_dealer_val
+    except TypeError:
+        for val in new_dealer_val:
+            if type(val) is list:
+                for n in val:
+                    if n+new_dealer_val[1] > 17 and n+new_dealer_val[1] <= 21:
+                        final_dealer_val = n+new_dealer_val[1]
+                        print("\nDealer stands with {}".format(new_dealer_val))
+                        sleep(.5)
+                        return final_dealer_val               
+    else:
         try:
-            if 21 in new_dealer_val:
-                print("\nOof. Dealer hits 21."), sleep(.2)
-                return "Dealer Win"
-        except TypeError:
-            if new_dealer_val == 21:
-                print("\nOof. Dealer hits 21."), sleep(.2)
-                return "Dealer Win"
-        try:
-            if new_dealer_val > 21:
-                print("\nDealer busts! Table win!") , sleep(.5)
-                return "Dealer Bust"
-        except TypeError:
-            if all(i>21 for i in new_dealer_val) == True:
-                print("\nDealer busts! Table win!"), sleep(.5)
-                return "Dealer Bust"    
-        else:
-            try:
-                print("\nDealer has {} / {}".format(new_dealer_val[0]),new_dealer_val[1])
-                continue
-            except TypeError:
-                print("\nDealer has {}.".format(new_dealer_val))
-                continue
+            print("\nDealer has {}".format(new_dealer_val))
+            sleep(.5)
+        except:
+            print("\nDealer has {} / {}".format(new_dealer_val[0], new_dealer_val[1]))
+            sleep(.5)
+        finally:
+            while new_dealer_val < 17:
+                new_card = deck.deal_card()
+                new_val = get_card_val(new_card)
+                dealer_cards.append(new_card)
+                dealer_card_vals.append(new_val)
+                print("\nDealer draws a {}.".format(new_card)), sleep(.5)
+                new_dealer_val = sum_cards(dealer_card_vals, new_dealer_val)
+                try:
+                    if 21 in new_dealer_val:
+                        print("\nOof. Dealer hits 21."), sleep(.2)
+                        return "Dealer Win"
+                except TypeError:
+                    if new_dealer_val == 21:
+                        print("\nOof. Dealer hits 21."), sleep(.2)
+                        return "Dealer Win"
+                try:
+                    if new_dealer_val > 21:
+                        print("\nDealer busts with {}! Table win!".format(new_dealer_val)) , sleep(.5)
+                        return "Dealer Bust"
+                except TypeError:
+                    if all(i>21 for i in new_dealer_val) == True:
+                        print("\nDealer busts with {}! Table win!".format(new_dealer_val)), sleep(.5)
+                        return "Dealer Bust"    
+                else:
+                    try:
+                        print("\nDealer has {} / {}".format(new_dealer_val[0]),new_dealer_val[1])
+                        continue
+                    except TypeError:
+                        print("\nDealer has {}.".format(new_dealer_val))
+                        continue
         return new_dealer_val
 
 def ask_hit_again(player_card_vals, player_cards, player_val):
-    while True:
+    player_stand = False
+    while player_stand == False:
         hit_again = command_parse("\nWould you like to hit again?\n")
-        clearFunc()
+    #    clearFunc()
         if hit_again in ['hit me', 'hit', 'h'] or hit_again in y_responses:
             hit_me(player_cards, player_card_vals, player_val)
         elif hit_again in ['stay', 'stand', 's'] or hit_again in n_responses:
             if type(player_val) is list:
                 final_player_val = max(player_val)
                 print("\n{} stands with {}.".format(player1.name, final_player_val))
+                player_stand = True
+                return final_player_val
             else:
                 final_player_val = player_val
                 print("\n{} stands with {}.".format(player1.name, final_player_val))
-            break
+                player_stand = True
+                return final_player_val
         else:
             print("Invalid input.")
             continue
@@ -500,30 +522,30 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False):
     try:
         if 21 in new_player_val:
             print("\n21!!! You win!")
-            return "Win"
+            new_player_val = "Win"
+        elif all(i>21 for i in new_player_val) == True:
+            print("\nYou bust! Sorry!"), sleep(.5)
+            new_player_val = "Bust"    
     except TypeError:
         if new_player_val == 21:
             print("\n21!!! You win!"), sleep(.5)
-            return "Win"
-    try:
-        if new_player_val > 21:
+            new_player_val = "Win"
+        elif new_player_val > 21:
             print("\nYou have {}.".format(new_player_val)), sleep (.5)
             print("\nYou bust! Sorry!"), sleep(.5)
             new_player_val = "Bust"
-            
-    except TypeError:
-        if all(i>21 for i in new_player_val) == True:
-            print("\nYou bust! Sorry!"), sleep(.5)
-            new_player_val = "Bust"
-    count += 1
-    if double_down == True:
-        print_player_val(new_player_val)
-    elif new_player_val in ["Bust", "Win"]:
-        pass
+    if not new_player_val in ["Bust", "Win"]:
+        count += 1
+        if double_down == True:
+            print_player_val(new_player_val)
+            return new_player_val
+        else:
+            print_player_val(new_player_val)
+            hit_again = ask_hit_again(player_card_vals, player_cards, new_player_val)
+            final_player_val = hit_again
+            return final_player_val
     else:
-        print_player_val(new_player_val)
-        ask_hit_again(player_card_vals, player_cards, new_player_val)
-    return new_player_val
+        return new_player_val
 
 def print_player_val(new_player_val):
 #    val_type = type(new_player_val)
@@ -592,7 +614,7 @@ while True:
             # end loop
             if player1.chip_count > 0:
                 play_again = command_parse("\nPlay another hand?\n") 
-                clearFunc()
+            #    clearFunc()
                 if play_again in y_responses:
                     print("\n{}'s current chip count: {}".format(player1.name, player1.chip_count))
                     continue
@@ -600,7 +622,7 @@ while True:
                     killswitch()
             else:
                 print("\nYou're out of chips!\nYou can find an ATM every 6 feet. Surcharge only $99.99 for a limited time!!!")
-                clearFunc()
+            #    clearFunc()
                 print("\n\n\n\nMAY GOD HAVE MERCY ON YOUR SOUL.")
                 killswitch()
 

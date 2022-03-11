@@ -1,4 +1,4 @@
-# # ## a pile of junk, ignore
+# # # ## a pile of junk, ignore
 # import random
 
 # class Deck:
@@ -27,22 +27,31 @@
 
 # deck = Deck()
 
-# def get_card_val(card):
+# def get_card_val(card, get_name=False):
 #     card_val = 0
 #     for key in deck.card_values.keys():
 #         if card.startswith(key):
-#             # if card.startswith("Ace"):
-                
-#             card_val = deck.card_values[key]
-#     return card_val
+#             if get_name == True:
+#                 split_card = card.split()
+#                 card_name = split_card[0]
+#                 return card_name
+#             else:
+#                 card_val = deck.card_values[key]
+#                 return card_val
 
-# print(get_card_val("Two of Diamonds"))
-# print(get_card_val("King of Diamonds"))
-# print(get_card_val("Queen of Diamonds"))
-# print(get_card_val("Four of Diamonds"))
-# print(get_card_val("Seven of Diamonds"))
 # print(get_card_val("Ace of Diamonds"))
- 
-nums = [10, 8]
-nums.sort()
-print(nums)
+
+new_dealer_val = [[1, 11], 7]
+
+def testicles(val):
+    for val in new_dealer_val:
+        print(val)
+        if type(val) is list:
+            for n in val:
+                print(n)
+                if n+new_dealer_val[1] > 17 and n+new_dealer_val[1] <= 21:
+                    final_dealer_val = n+new_dealer_val[1]
+                    print("\nDealer stands with {}".format(final_dealer_val))
+                    return final_dealer_val  
+
+print(testicles(new_dealer_val))
