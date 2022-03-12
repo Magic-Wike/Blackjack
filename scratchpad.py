@@ -41,17 +41,22 @@
 
 # print(get_card_val("Ace of Diamonds"))
 
-new_dealer_val = [[1, 11], 7]
+# new_dealer_val = [[1, 11], 7]
 
-def testicles(val):
-    for val in new_dealer_val:
-        print(val)
-        if type(val) is list:
-            for n in val:
-                print(n)
-                if n+new_dealer_val[1] > 17 and n+new_dealer_val[1] <= 21:
-                    final_dealer_val = n+new_dealer_val[1]
-                    print("\nDealer stands with {}".format(final_dealer_val))
-                    return final_dealer_val  
+# def testicles(val):
+#     for val in new_dealer_val:
+#         print(val)
+#         if type(val) is list:
+#             for n in val:
+#                 print(n)
+#                 if n+new_dealer_val[1] > 17 and n+new_dealer_val[1] <= 21:
+#                     final_dealer_val = n+new_dealer_val[1]
+#                     print("\nDealer stands with {}".format(final_dealer_val))
+#                     return final_dealer_val  
 
-print(testicles(new_dealer_val))
+# print(testicles(new_dealer_val))
+final_player_val = "Bust"
+
+if final_player_val in ["Bust", "Win"]:
+        print("3",final_player_val)
+        

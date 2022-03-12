@@ -1,9 +1,6 @@
 import random
-from re import L
 import sys
 import os
-from xml.dom.minidom import parseString
-from xml.etree.ElementTree import TreeBuilder
 import random_names
 from time import sleep
 
@@ -186,7 +183,7 @@ def get_card_val(card, get_name=False):
                 return card_val
     
 
-def sum_cards(card_list, player_val=0, dealer=False):  
+def sum_cards(card_list, player_val=0):  
     # will return list if multiple values under 21
     print("Card list", card_list)
     ace = [[1, 11], [11, 1]]
@@ -196,62 +193,68 @@ def sum_cards(card_list, player_val=0, dealer=False):
                 card.sort()
         except:
             continue
+    # trouble here with handling multiple cards
     if len(card_list) > 2:
-        new_card_list = [player_val]
-        new_card_list.append(card_list[-1])
-        try:
-            cards_val = sum(new_card_list)
-            return cards_val
-        except TypeError:
-            pass
+        new_card = card_list[-1]
+        if type(card_list[0]) is list and new_card == [1, 11]:
+            sum1 = card_list[0][0] + new_card[0]
+            sum2 = card_list[0][1] + new_card[0]
+            if sum2 == 21:
+                cards_val = sum2
+            else: 
+                cards_val = [sum1, sum2]
+        else:
+            cards_val = sum(card_list)
+        return cards_val
+            
     else:
         new_card_list = card_list
 
-    print(new_card_list)
-    card1 = new_card_list[0]
-    card2 = new_card_list[1]
-    if type(new_card_list[0]) is list and type(new_card_list[1]) is list:
-        if card1 == [1, 11]:
-            card1.pop(1) 
-            cards_val = 2
-        else:
-            sum1 = card1[0] + card2[0]
-            sum2 = card1[1] + card2[1]
-            if sum2 > 21:
-                cards_val = sum1
-            elif sum1 > 21:
-                cards_val = sum2
+        print(new_card_list)
+        card1 = new_card_list[0]
+        card2 = new_card_list[1]
+        if type(new_card_list[0]) is list and type(new_card_list[1]) is list:
+            if card1 == [1, 11]:
+                card1.pop(1) 
+                cards_val = 2
             else:
+                sum1 = card1[0] + card2[0]
+                sum2 = card1[1] + card2[1]
+                if sum2 > 21:
+                    cards_val = sum1
+                elif sum1 > 21:
+                    cards_val = sum2
+                else:
+                    cards_val = [sum1, sum2]
+                    cards_val.sort()
+        elif type(card1) is list and type(card2) is int:
+            sum1 = card1[0] + card2
+            sum2 = card1[1] + card2
+            if sum1 > 21:
+                cards_val = sum2
+            elif sum2 > 21:
+                cards_val = sum1
+            elif sum1 == 21:
+                cards_val = sum1
+            
+            else: 
                 cards_val = [sum1, sum2]
-                cards_val.sort()
-    elif type(card1) is list and type(card2) is int:
-        sum1 = card1[0] + card2
-        sum2 = card1[1] + card2
-        if sum1 > 21:
-            cards_val = sum2
-        elif sum2 > 21:
-            cards_val = sum1
-        elif sum1 == 21:
-            cards_val = sum1
-        
-        else: 
-            cards_val = [sum1, sum2]
-            cards_val.sort() 
-    elif type(card1) is int and type(card2) is list:
-        sum1 = card1 + card2[0]
-        sum2 = card1 + card2[1]
-        if sum1 > 21:
-            cards_val = sum2
-        elif sum2 > 21:
-            cards_val = sum1
-        elif sum1 == 21:
-            cards_val = sum1
-        else: 
-            cards_val = [sum1, sum2]
-            cards_val.sort() 
-    else:
-        cards_val = sum(new_card_list)
-    return cards_val
+                cards_val.sort() 
+        elif type(card1) is int and type(card2) is list:
+            sum1 = card1 + card2[0]
+            sum2 = card1 + card2[1]
+            if sum1 > 21:
+                cards_val = sum2
+            elif sum2 > 21:
+                cards_val = sum1
+            elif sum1 == 21:
+                cards_val = sum1
+            else: 
+                cards_val = [sum1, sum2]
+                cards_val.sort() 
+        else:
+            cards_val = sum(new_card_list)
+        return cards_val
 
 
 def player_win(bet, is_bj=False):
@@ -302,7 +305,7 @@ def play_hand(dealer_cards, player_dict, bet):
     print("\n\nDealer checking for 21...\n")
     sleep(2)
     if type(dealer_val) is list and 21 in dealer_val:
-        print("Dealer has blackjack! \n")
+        print("\nDealer has blackjack!")
         sleep(.05)
         print("\nEveryone loses =(")
         if player_val == 21:
@@ -352,6 +355,7 @@ def play_hand(dealer_cards, player_dict, bet):
                 # double down command 
                 elif player_hit in ['double', 'double down', 'd']:
                     total_bet += bet
+                    player1.chip_count -= bet
                     # add face up or down function later?
                     print("\n{} bets another ${}.".format(player1.name, bet))
                     sleep(.05)
@@ -363,7 +367,7 @@ def play_hand(dealer_cards, player_dict, bet):
                     # BUG: something wrong here, loop ends when doubling an ace value pair
                     if final_player_val in ["Bust", "Win"]:
                         if final_player_val == "Win":
-                            player_win(total_bet)  
+                            player_win(total_bet) 
 
                 elif player_hit in ['stay', 'stand', 's'] or player_hit in n_responses:
                     if type(player_val) is list:
@@ -373,18 +377,22 @@ def play_hand(dealer_cards, player_dict, bet):
                         final_player_val = player_val
                         print("\n{} stands with {}".format(player1.name, final_player_val))
                 elif player_hit in ['hit', 'hit me', 'h'] or player_hit in y_responses:
-                    final_player_val = hit_me(player_cards, player_card_vals, player_val)
-                    if final_player_val == "Win":
+                    new_player_val = hit_me(player_cards, player_card_vals, player_val)
+                    if new_player_val == "Win":
                         print("Reached play_hand")
                         player_win(total_bet)   
                         break
-                    elif final_player_val == "Bust":  
+                    elif new_player_val == "Bust":  
                         print("\nYou lose ${}.".format(total_bet))
-                        break
+                        break 
+                    else:
+                        hit_again = ask_hit_again(player_card_vals, player_cards, new_player_val)
+                        final_player_val = hit_again
                 else:
                     print('\nInvalid input.')
                     continue
-            
+                if player_val == 21:
+                    break
                 final_dealer_val = dealer_hand(dealer_cards, dealer_card_vals)
                 if final_player_val in ["Win", "Bust"]:
                     break
@@ -428,29 +436,32 @@ def calc_winner(final_dealer_val, final_player_val):
 
 def dealer_hand(dealer_cards, dealer_card_vals):
     print("\nDealer's flips second card..."), sleep(.5)
-    new_dealer_val = sum_cards(dealer_card_vals)
-    try:
-        if new_dealer_val > 17:
-            print("\nDealer stands with {}".format(new_dealer_val))
-            sleep(.5)
-            return new_dealer_val
-    except TypeError:
-        for val in new_dealer_val:
+    first_dealer_val = sum_cards(dealer_card_vals)
+    if type(first_dealer_val) is int and first_dealer_val > 17:
+        final_dealer_val = first_dealer_val
+        print("\nDealer stands with {}".format(final_dealer_val))
+        sleep(.5)
+        return final_dealer_val
+    elif type(first_dealer_val) is list:
+       for val in first_dealer_val:
             if type(val) is list:
                 for n in val:
-                    if n+new_dealer_val[1] > 17 and n+new_dealer_val[1] <= 21:
+                    if n+first_dealer_val[1] > 17 and n+first_dealer_val[1] <= 21:
                         final_dealer_val = n+new_dealer_val[1]
-                        print("\nDealer stands with {}".format(new_dealer_val))
+                        print("\nDealer stands with {}".format(final_dealer_val))
                         sleep(.5)
-                        return final_dealer_val               
+                        return final_dealer_val
+                    else:
+                        pass               
     else:
         try:
-            print("\nDealer has {}".format(new_dealer_val))
+            print("\nDealer has {}".format(first_dealer_val))
             sleep(.5)
         except:
-            print("\nDealer has {} / {}".format(new_dealer_val[0], new_dealer_val[1]))
+            print("\nDealer has {} / {}".format(first_dealer_val[0], first_dealer_val[1]))
             sleep(.5)
         finally:
+            new_dealer_val = first_dealer_val
             while new_dealer_val < 17:
                 new_card = deck.deal_card()
                 new_val = get_card_val(new_card)
@@ -477,19 +488,20 @@ def dealer_hand(dealer_cards, dealer_card_vals):
                 else:
                     try:
                         print("\nDealer has {} / {}".format(new_dealer_val[0]),new_dealer_val[1])
-                        continue
                     except TypeError:
                         print("\nDealer has {}.".format(new_dealer_val))
-                        continue
         return new_dealer_val
 
 def ask_hit_again(player_card_vals, player_cards, player_val):
     player_stand = False
+    count = 0
     while player_stand == False:
+        print('You have {}.'.format(player_val))
         hit_again = command_parse("\nWould you like to hit again?\n")
     #    clearFunc()
         if hit_again in ['hit me', 'hit', 'h'] or hit_again in y_responses:
-            hit_me(player_cards, player_card_vals, player_val)
+            count += 1
+            hit_me(player_cards, player_card_vals, player_val, count=count)
         elif hit_again in ['stay', 'stand', 's'] or hit_again in n_responses:
             if type(player_val) is list:
                 final_player_val = max(player_val)
@@ -500,14 +512,14 @@ def ask_hit_again(player_card_vals, player_cards, player_val):
                 final_player_val = player_val
                 print("\n{} stands with {}.".format(player1.name, final_player_val))
                 player_stand = True
+                count += 1
                 return final_player_val
         else:
             print("Invalid input.")
             continue
     
 # will return "Win", "Bust" or final_player_val
-def hit_me(player_cards, player_card_vals, player_val, double_down=False):
-    count = 0
+def hit_me(player_cards, player_card_vals, player_val, double_down=False, count=0):
     print("\nDealing card...")
     sleep(.5)
     new_card = deck.deal_card()
@@ -515,37 +527,32 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False):
     new_val = get_card_val(new_card)
     player_card_vals.append(new_val)
     print("\nDealer gives {} a {}".format(player1.name, new_card)), sleep(.2)
-    if count == 0:
-        new_player_val = sum_cards(player_card_vals, player_val)
-    else:
-        new_player_val = sum_cards(player_card_vals, new_player_val)
+    final_player_val = None
+    new_player_val = sum_cards(player_card_vals, player_val)
     try:
         if 21 in new_player_val:
             print("\n21!!! You win!")
-            new_player_val = "Win"
+            final_player_val = "Win"
+            print("1", final_player_val)
         elif all(i>21 for i in new_player_val) == True:
             print("\nYou bust! Sorry!"), sleep(.5)
-            new_player_val = "Bust"    
+            final_player_val = "Bust"
+            print("1",final_player_val)    
+
     except TypeError:
         if new_player_val == 21:
             print("\n21!!! You win!"), sleep(.5)
-            new_player_val = "Win"
+            final_player_val = "Win"
         elif new_player_val > 21:
             print("\nYou have {}.".format(new_player_val)), sleep (.5)
             print("\nYou bust! Sorry!"), sleep(.5)
-            new_player_val = "Bust"
-    if not new_player_val in ["Bust", "Win"]:
-        count += 1
-        if double_down == True:
-            print_player_val(new_player_val)
-            return new_player_val
-        else:
-            print_player_val(new_player_val)
-            hit_again = ask_hit_again(player_card_vals, player_cards, new_player_val)
-            final_player_val = hit_again
-            return final_player_val
+            final_player_val = "Bust"
+        return final_player_val
     else:
-        return new_player_val
+        final_player_val = new_player_val
+        print_player_val(final_player_val)
+        return final_player_val
+
 
 def print_player_val(new_player_val):
 #    val_type = type(new_player_val)
