@@ -403,7 +403,7 @@ def play_hand(player_cards, player_card_vals, player_val, bet):
                     print("\nYou lose ${}.".format(total_bet))
                     break
                 else:
-                    ask_hit_again(player_card_vals, player_cards, new_player_val)
+                    new_player_val = ask_hit_again(player_card_vals, player_cards, new_player_val)
                     break
             else:
                 print('\nInvalid input.')
