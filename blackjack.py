@@ -1,17 +1,19 @@
 import random
 import sys
 import os
-from xml.sax import handler
-import random_names
+import random_names # for CPU players later
 from time import sleep
+
+# global variables 
 
 y_responses = ['y', 'yes', 'ya', 'yup', 'send it', 'hit me']
 n_responses = ['n', 'no', 'nope', 'nah']
 quit_commands = ['quit', 'exit', 'x', 'bye']
 hand_commands = ['hit', 'h', 'hit me', 'double', 'd', 'double down', 'stay', 'stand', 's', 'split']
 user_commands = {'chips': 'return current # of player chips', 'commands / cmd': 'show commands list',}
+userOS = str(sys.platform)
 
-
+#class defintions 
 
 class Deck:
     card_names = ['Two of Clubs', 'Two of Spades', 'Two of Diamonds', 'Two of Hearts', 'Three of Clubs', 'Three of Spades', 'Three of Diamonds', 'Three of Hearts', 'Four of Clubs', 'Four of Spades', 'Four of Diamonds', 'Four of Hearts', 'Five of Clubs', 'Five of Spades', 'Five of Diamonds', 'Five of Hearts', 'Six of Clubs', 'Six of Spades', 'Six of Diamonds', 'Six of Hearts', 'Seven of Clubs', 'Seven of Spades', 'Seven of Diamonds', 'Seven of Hearts', 'Eight of Clubs', 'Eight of Spades', 'Eight of Diamonds', 'Eight of Hearts', 'Nine of Clubs', 'Nine of Spades', 'Nine of Diamonds', 'Nine of Hearts', 'Ten of Clubs', 'Ten of Spades', 'Ten of Diamonds', 'Ten of Hearts', 'Jack of Clubs', 'Jack of Spades', 'Jack of Diamonds', 'Jack of Hearts', 'Queen of Clubs', 'Queen of Spades', 'Queen of Diamonds', 'Queen of Hearts', 'King of Clubs', 'King of Spades', 'King of Diamonds', 'King of Hearts', 'Ace of Clubs', 'Ace of Spades', 'Ace of Diamonds', 'Ace of Hearts']
@@ -63,7 +65,6 @@ class Player:
         pass
 
 
-
 class CPU_player:
 
     def __init__(self, chip_count=random.randrange(500, 5000, 50), high_roller=False):
@@ -71,7 +72,7 @@ class CPU_player:
         self.chip_count = chip_count
         self.high_roller = high_roller
 
-userOS = str(sys.platform)
+# utility functions, input handling 
 
 def clearFunc():
   if "win32" not in userOS:
@@ -90,8 +91,18 @@ def killswitch():
 def print_user_commands():
     print("\n")
     for k, v in user_commands.items():
-        print("{}: {}".format(k, v))
-    
+        print("{}: {}".format(k, v))   
+
+def welcome_msg():
+    sleep(.5)
+    print("""\n
+    What up, {}! The game is 50 / 500 Blackjack. 
+
+    The minimum bet is $50 and the max bet is $100.\n
+    I'm a big noob in this is currently broken as fuck,
+    but we're getting there.\n
+    Enjoy =)
+    """.format(player1.name)), sleep(.5)
 
 def command_parse(user_input):
     while True:
@@ -181,8 +192,7 @@ def get_card_val(card, get_name=False):
                 return card_name
             else:
                 card_val = deck.card_values[key]
-                return card_val
-    
+                return card_val  
 
 def sum_cards(card_list, player_val=0):  
     # will return list if multiple values under 21
@@ -234,6 +244,8 @@ def sum_cards(card_list, player_val=0):
         print("5 new_vals", final_val)
         return final_val
 
+# dealer hand, stands w/ 17 or above. returns final dealer val or dealer win/bust
+
 def dealer_hand(dealer_cards, dealer_card_vals):
     print("\nDealer's flips second card..."), sleep(.5)
     first_dealer_val = sum_cards(dealer_card_vals)
@@ -250,6 +262,7 @@ def dealer_hand(dealer_cards, dealer_card_vals):
                 print("\nDealer stands with {}".format(final_dealer_val))
                 sleep(.5)
                 return final_dealer_val
+    # BUG w/ aces, elif returns None if list is not > 17 ^^
     else:
         try:
             print("\nDealer has {}".format(first_dealer_val))
@@ -321,7 +334,14 @@ def print_player_cards(player_cards):
     print("\n{}'s cards:".format(player1.name))
     for card in player_cards:
         print(str(card))
-      
+
+def print_player_val(new_player_val):
+    try:
+        print("\nYou have {}/{}.".format(new_player_val[0], new_player_val[1]))
+    except TypeError:
+        print("\nYou have {}".format(new_player_val))
+
+# first level of the hand. initial hit/stand/double/etc. returns final player value and accrued bets
 
 def play_hand(player_cards, player_card_vals, player_val, bet):
     total_bet = bet
@@ -485,23 +505,6 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False, count=
             print_player_val(final_player_val)
             return final_player_val    
 
-def print_player_val(new_player_val):
-    try:
-        print("\nYou have {}/{}.".format(new_player_val[0], new_player_val[1]))
-    except TypeError:
-        print("\nYou have {}".format(new_player_val))
-
-def welcome_msg():
-    sleep(.5)
-    print("""\n
-    What up, {}! The game is 50 / 500 Blackjack. 
-
-    The minimum bet is $50 and the max bet is $100.\n
-    I'm a big noob in this is currently broken as fuck,
-    but we're getting there.\n
-    Enjoy =)
-    """.format(player1.name)), sleep(.5)
-
 def ask_play_again():
     while True:
         if player1.chip_count > 0:
@@ -612,6 +615,7 @@ def blackjack():
                     else:
                         print("\nSomething be broke")
                 ask_play_again()
+
 # gameplay loop
 
 while True:
