@@ -9,7 +9,7 @@ y_responses = ['y', 'yes', 'ya', 'yup', 'send it', 'hit me']
 n_responses = ['n', 'no', 'nope', 'nah']
 quit_commands = ['quit', 'exit', 'x', 'bye']
 hand_commands = ['hit', 'h', 'hit me', 'double', 'd', 'double down', 'stay', 'stand', 's', 'split']
-user_commands = {'chips': 'return current # of player chips', 'commands': 'show commands list'}
+user_commands = {'chips': 'return current # of player chips', 'commands / cmd': 'show commands list',}
 
 
 
@@ -245,16 +245,11 @@ def dealer_hand(dealer_cards, dealer_card_vals):
     elif type(first_dealer_val) is list:
         print("first_Dealer_val", first_dealer_val)
         for val in first_dealer_val:
-            if type(val) is list:
-                for n in val:
-                    if n+first_dealer_val[1] > 17 and n+first_dealer_val[1] <= 21:
-                        final_dealer_val = n+new_dealer_val[1]
-                        print("\nDealer stands with {}".format(final_dealer_val))
-                        sleep(.5)
-                        return final_dealer_val
-                    else:
-                        pass               
-                
+            if val > 17 and val < 21:
+                final_dealer_val = val
+                print("\nDealer stands with {}".format(final_dealer_val))
+                sleep(.5)
+                return final_dealer_val
     else:
         try:
             print("\nDealer has {}".format(first_dealer_val))
@@ -395,16 +390,29 @@ def play_hand(player_cards, player_card_vals, player_val, bet):
             elif player_hit in ['hit', 'hit me', 'h'] or player_hit in y_responses:
                 new_player_val = hit_me(player_cards, player_card_vals, player_val)
                 print("new_player_val", new_player_val)
-                if new_player_val == "Win" or new_player_val == 21:
-                    print("Reached play_hand")
-                    player_win(total_bet)   
-                    break
-                elif new_player_val == "Bust" or new_player_val > 21:  
-                    print("\nYou lose ${}.".format(total_bet))
-                    break
-                else:
-                    new_player_val = ask_hit_again(player_card_vals, player_cards, new_player_val)
-                    break
+                try:
+                    if new_player_val == "Win" or new_player_val == 21:
+                        print("Reached play_hand")
+                        player_win(total_bet)   
+                        break
+                    elif new_player_val == "Bust" or new_player_val > 21:  
+                        print("\nYou lose ${}.".format(total_bet))
+                        break
+                    else:
+                        final_player_val = ask_hit_again(player_card_vals, player_cards, new_player_val)
+                        return final_player_val, total_bet
+                except TypeError:
+                    if new_player_val in ["Win", 21]:
+                        print("Reached play_hand")
+                        player_win(total_bet)   
+                        break
+                    elif new_player_val in ["Bust"]:  
+                        print("\nYou lose ${}.".format(total_bet))
+                        break
+                    else:
+                        final_player_val = ask_hit_again(player_card_vals, player_cards, new_player_val)
+                        return final_player_val, total_bet
+
             else:
                 print('\nInvalid input.')
                 continue
@@ -419,23 +427,24 @@ def ask_hit_again(player_card_vals, player_cards, player_val):
     #    clearFunc()
         if hit_again in ['hit me', 'hit', 'h'] or hit_again in y_responses:
             count += 1
-            hit_me(player_cards, player_card_vals, player_val, count=count)
+            final_player_val = hit_me(player_cards, player_card_vals, player_val, count=count)
+            # if final_player_val in ["Bust", "Win"]:
+            return final_player_val
         elif hit_again in ['stay', 'stand', 's'] or hit_again in n_responses:
             if type(player_val) is list:
                 final_player_val = max(player_val)
                 print("\n{} stands with {}.".format(player1.name, final_player_val))
                 player_stand = True
-                
             else:
                 final_player_val = player_val
                 print("\n{} stands with {}.".format(player1.name, final_player_val))
                 player_stand = True
                 count += 1
-                
         else:
             print("Invalid input.")
             continue
-    
+    return final_player_val
+
 # will return "Win", "Bust" or final_player_val
 def hit_me(player_cards, player_card_vals, player_val, double_down=False, count=0):
     print("\nDealing card...")
@@ -546,8 +555,11 @@ def blackjack():
         try:
             if 21 in player_val:
                 player_win(bet, is_bj=True)
+                break
         except:
-            pass
+            if player_val == 21:
+                player_win(bet, is_bj=True)   
+                break
         dealer_card_vals =[]
         for card in dealer_cards:
             card_val = get_card_val(card)
