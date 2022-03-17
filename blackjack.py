@@ -98,8 +98,9 @@ def welcome_msg():
     print("""\n
     What up, {}! The game is 50 / 500 Blackjack. 
 
-    The minimum bet is $50 and the max bet is $100.\n
-    I'm a big noob and this is a work in progress. Play at your own peril!\n
+    The minimum bet is $50 and the max bet is $100.
+    For now you have $1000 to play with, bet smart!\n 
+    I'm a big noob and this is a work in progress. Play at your own peril!
     Enjoy =)
     """.format(player1.name))
 
@@ -142,7 +143,7 @@ def command_parse(user_input):
 
 def get_bet(min=50, max=500):
     while True:
-        raw_bet = input("\nPlace your bets! (try: 'rebet' / 'r'):\n")
+        raw_bet = input("\nPlace your bets! (try: 'rebet' / 'r', 'chips'):\n")
     #    clearFunc()
         if raw_bet in quit_commands:
             killswitch()
@@ -248,7 +249,6 @@ def dealer_hand(dealer_cards, dealer_card_vals):
         sleep(.5)
         return final_dealer_val
     elif type(first_dealer_val) is list:
-        print("first_Dealer_val", first_dealer_val)
         for val in first_dealer_val:
             if val > 17 and val < 21:
                 final_dealer_val = val
@@ -468,7 +468,7 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False, count=
     player_cards.append(new_card)
     new_val = get_card_val(new_card)
     player_card_vals.append(new_val)
-    print("\nDealer gives {} a {}".format(player1.name, new_card)), sleep(.2)
+    print("\nDealer gives {} a {}".format(player1.name, new_card)), sleep(.5)
     new_player_val = sum_cards(player_card_vals, player_val)
     try:
         if new_player_val == 21:
@@ -477,7 +477,7 @@ def hit_me(player_cards, player_card_vals, player_val, double_down=False, count=
             return final_player_val
         elif new_player_val > 21:
             print("\nYou have {}.".format(new_player_val)), sleep (.5)
-            print("\nYou bust! Sorry!"), sleep(.5)
+            print("\nYou bust! Sorry!"), sleep(1)
             final_player_val = "Bust"
             return final_player_val
         else:
