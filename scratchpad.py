@@ -1,62 +1,219 @@
-# # # ## a pile of junk, ignore
-# import random
+import random
+import sys
+import time
+import itertools
 
-# class Deck:
-#     card_names = ['Two of Clubs', 'Two of Spades', 'Two of Diamonds', 'Two of Hearts', 'Three of Clubs', 'Three of Spades', 'Three of Diamonds', 'Three of Hearts', 'Four of Clubs', 'Four of Spades', 'Four of Diamonds', 'Four of Hearts', 'Five of Clubs', 'Five of Spades', 'Five of Diamonds', 'Five of Hearts', 'Six of Clubs', 'Six of Spades', 'Six of Diamonds', 'Six of Hearts', 'Seven of Clubs', 'Seven of Spades', 'Seven of Diamonds', 'Seven of Hearts', 'Eight of Clubs', 'Eight of Spades', 'Eight of Diamonds', 'Eight of Hearts', 'Nine of Clubs', 'Nine of Spades', 'Nine of Diamonds', 'Nine of Hearts', 'Ten of Clubs', 'Ten of Spades', 'Ten of Diamonds', 'Ten of Hearts', 'Jack of Clubs', 'Jack of Spades', 'Jack of Diamonds', 'Jack of Hearts', 'Queen of Clubs', 'Queen of Spades', 'Queen of Diamonds', 'Queen of Hearts', 'King of Clubs', 'King of Spades', 'King of Diamonds', 'King of Hearts', 'Ace of Clubs', 'Ace of Spades', 'Ace of Diamonds', 'Ace of Hearts']
-#     card_values = {'Two' : 2, 'Three': 3, 'Four' : 4, 'Five': 5, 'Six': 6, 'Seven': 7, 'Eight': 8, 'Nine': 9, 'Ten': 10, 'Jack': 10, 'Queen': 10, 'King': 10, 'Ace': [1, 10]}
+class Blackjack:
+    def __init__(self):
+        self.total_bet = 0
+        self.dealer_show_card_value = 0
+        self.dealer_hole_card_value = 0
 
-#     def __init__(self, num_shoes=1):
-#         self.cards = self.generate_deck(num_shoes)
-#         self.shoe_size = str(num_shoes)
-#         pass
+    def spinning_cursor(self, wait):
+        self.spinner = itertools.cycle(['-', '/', '|', '\\'])
+        for _ in range(wait):
+            sys.stdout.write(next(self.spinner))
+            sys.stdout.flush()
+            time.sleep(0.1)
+            sys.stdout.write('\b')
 
-#     def generate_deck(self, num_shoes=1):
-#         deck = []
-#         for i in range(num_shoes):
-#             for card in self.card_names:
-#                 deck.append(card)
-#             random.shuffle(deck)
-#         return deck
+    def set_up(self):
+        print("Hello! What's your name? ")
+        self.name = input()
+        self.spinning_cursor(5)
+        print(f"\nNice to meet you {self.name}! How much money do you have on you?\n")
+        self.money = int(input())
+        self.spinning_cursor(5)
+        print("\nAlright, let's play some blackjack!\n")
 
-#     def deal_card(self, num_cards=1):
-#         for i in range(num_cards):
-#             random_index = random.randint(1, len(self.cards)-1)
-#             random_card = self.cards[random_index]
-#         return random_card        
+    def cards(self):
+        # Player cards
+        self.player_card_1 = random.randint(1, 14)
+        if self.player_card_1 == 1 or self.player_card_1 == 11:
+            self.player_card_1 = "Ace"
+        self.player_card_2 = random.randint(1, 14)
+        if self.player_card_2 == 1 or self.player_card_2 == 11:
+            self.player_card_2 = "Ace"
+        self.player_card_3 = random.randint(1, 14)
+        if self.player_card_3 == 1 or self.player_card_3 == 11:
+            self.player_card_3 = "Ace"
+        self.player_card_4 = random.randint(1, 14)
+        if self.player_card_4 == 1 or self.player_card_4 == 11:
+            self.player_card_4 = "Ace"
+            
+        # Dealer cards    
+        self.dealer_show_card = random.randint(1, 14)
+        if self.dealer_show_card == 1 or self.dealer_show_card == 11:
+            self.dealer_show_card = "Ace"
+        self.dealer_hole_card = random.randint(1, 14)
+        if self.dealer_hole_card == 1 or self.dealer_hole_card == 11:
+            self.dealer_hole_card = "Ace"
 
+        # Dealer Ace decision: 1 or 11
+        if self.dealer_show_card == "Ace" and self.dealer_hole_card != "Ace":
+            if self.dealer_hole_card > 10:
+                self.dealer_show_card_value == 1
+            else:
+                self.dealer_show_card_value == 11
+        if self.dealer_hole_card == "Ace" and self.dealer_show_card != "Ace":
+            if self.dealer_show_card > 10:
+                self.dealer_hole_card_value == 1
+            else:
+                self.dealer_hole_card_value == 11
+        if self.dealer_show_card == "Ace" and self.dealer_hole_card == "Ace":
+            self.dealer_show_card_value == 11
+            self.dealer_hole_card_value == 1
+        if self.dealer_show_card != "Ace" and self.dealer_hole_card != "Ace":
+            self.dealer_hole_card_value = self.dealer_hole_card
+            self.dealer_show_card_value = self.dealer_show_card
 
-# deck = Deck()
+    def dealing_the_cards(self):
+        self.spinning_cursor(5)
+        print("Let's deal some cards.")
+        self.spinning_cursor(20)
+        print(f"Your cards are: {self.player_card_1} & {self.player_card_2}.")
+        self.spinning_cursor(5)
+        print(f"The dealer's show card is {self.dealer_show_card}.")
+        if self.player_card_1 == "Ace":
+            print("Your first card is an Ace. Would you like to count it as 1 or 11?")
+            self.player_card_1 = int(input())
+            while self.player_card_1 != 1 or self.player_card_1 != 11:
+                if self.player_card_1 == 1 or self.player_card_1 == 11:
+                    break
+                print("Please enter either 1 or 11: ")
+                self.player_card_1 = int(input())
 
-# def get_card_val(card, get_name=False):
-#     card_val = 0
-#     for key in deck.card_values.keys():
-#         if card.startswith(key):
-#             if get_name == True:
-#                 split_card = card.split()
-#                 card_name = split_card[0]
-#                 return card_name
-#             else:
-#                 card_val = deck.card_values[key]
-#                 return card_val
+        if self.player_card_2 == "Ace":
+            print("Your second card is an Ace. Would you like to count it as 1 or 11?")
+            self.player_card_2 = int(input())
+            while self.player_card_2 != 1 or self.player_card_2 != 11:
+                if self.player_card_2 == 1 or self.player_card_2 == 11:
+                    break                 
+                print("Please enter either 1 or 11: ")
+                self.player_card_2 = int(input())
 
-# print(get_card_val("Ace of Diamonds"))
+        self.player_score = self.player_card_1 + self.player_card_2
 
-# new_dealer_val = [[1, 11], 7]
+        self.spinning_cursor(10)   
+        if self.player_score > 21:
+            print("Game over!\nWould you like to start over? yes/no")
+            self.start_over = input()
+            if self.start_over.lower() == "yes":
+                blackjack.initialize()
+            else: 
+                print("Thanks for playing.")
+                sys.exit()
 
-# def testicles(val):
-#     for val in new_dealer_val:
-#         print(val)
-#         if type(val) is list:
-#             for n in val:
-#                 print(n)
-#                 if n+new_dealer_val[1] > 17 and n+new_dealer_val[1] <= 21:
-#                     final_dealer_val = n+new_dealer_val[1]
-#                     print("\nDealer stands with {}".format(final_dealer_val))
-#                     return final_dealer_val  
+    def betting(self):
+        self.spinning_cursor(10)
+        print("How much would you like to bet?")
+        self.first_bet = int(input())
+        while self.first_bet < 0 or self.first_bet > self.money:
+            print("Come one man, enter a valid bet.")
+            self.first_bet = int(input())
+            if self.first_bet >= 0 and self.first_bet <= self.money:
+                self.total_bet += self.first_bet
+                break   
 
-# print(testicles(new_dealer_val))
-final_player_val = "Bust"
+        if self.player_score < 21:
+            print("Would you like another card? 'hit me/pass'")
+            self.want_new_card_1 = input()
+            if self.want_new_card_1.lower() == "hit me" and self.player_card_3 != "Ace":
+                print("Your new card is:")
+                self.spinning_cursor(10)   
+                print(self.player_card_3)
+            elif self.player_card_3 == "Ace":
+                print("The card is an Ace. Would you like to count it as 1 or 11?")
+                self.player_card_3 = int(input())
+                while self.player_card_3 != 1 or self.player_card_3 != 11:
+                    if self.player_card_3 == 1 or self.player_card_3 == 11:
+                        break                        
+                    print("Please enter either 1 or 11: ")
+                    self.player_card_3 = int(input())
 
-if final_player_val in ["Bust", "Win"]:
-        print("3",final_player_val)
+        self.player_score += self.player_card_3
         
+        if self.player_score > 21:
+            self.spinning_cursor(10)   
+            print("Game over!\nWould you like to start over? Yes/No")
+            self.start_over = input()
+            if self.start_over.lower() == "yes":
+                blackjack.initialize()
+            else:
+                print("Thanks for playing.")
+                sys.exit()
+
+        self.spinning_cursor(10)
+        print("How much would you like to bet?")
+        self.second_bet = int(input())
+        while self.second_bet < 0 or (self.second_bet + self.total_bet) > self.money:
+            print("Come one man, enter a valid bet.")
+            self.second_bet = int(input())
+            if self.second_bet >= 0 and (self.second_bet + self.total_bet) <= self.money:
+                self.total_bet += self.second_bet
+                break                
+
+        if self.player_score < 21:
+            print("Would you like another card? 'hit me/pass'")
+            self.want_new_card_2 = input()
+            if self.want_new_card_2 == "hit me" and self.player_card_4 != "Ace":
+                print(f"Your new card is:")
+                self.spinning_cursor(10)   
+                print(self.player_card_4)
+            if self.player_card_4 == "Ace":
+                print("The card is an Ace. Would you like to count it as 1 or 11?")
+                self.player_card_4 = int(input())
+                while self.player_card_4 != 1 or self.player_card_4 != 11:
+                    if self.player_card_4 == 1 or self.player_card_4 == 11:
+                        break                      
+                    print("Please enter either 1 or 11: ")
+                    self.player_card_4 = int(input())
+               
+        self.player_score += self.player_card_4
+
+        if self.player_score > 21:
+            self.spinning_cursor(10)   
+            print("Game over!\nWould you like to start over? yes/no")
+            self.start_over = input()
+            if self.start_over.lower() == "yes":
+                blackjack.initialize()
+            else:
+                print("Thanks for playing.")
+                sys.exit()
+
+        self.spinning_cursor(10)
+        print("How much would you like to bet?")
+        self.third_bet = int(input())
+        while self.third_bet < 0 or (self.third_bet + self.total_bet) > self.money:
+            print("Come one man, enter a valid bet.")
+            self.third_bet = int(input())
+            if self.third_bet >= 0 and (self.third_bet + self.total_bet) <= self.money:
+                self.total_bet += self.third_bet
+                break                
+
+    def results(self):
+        self.dealer_score = self.dealer_hole_card_value + self.dealer_show_card_value
+        print(f"The dealer's cards are: {self.dealer_show_card} & {self.dealer_hole_card}")
+        if self.player_score == 21:
+            print(f"Blackjack! You won {self.total_bet*2}.")
+            sys.exit()
+        elif self.dealer_score == 21:
+            print("The dealer has Blackjack. You lose.")
+            sys.exit()
+        elif self.player_score > 21 and self.dealer_score < 21:
+            print("You lose.")
+            sys.exit()
+        elif self.player_score < 21 and self.dealer_score > 21:
+            print(f"You won {self.total_bet*2}.")
+            sys.exit()
+
+    def initialize(self):
+
+        self.set_up()
+        self.cards()
+        self.dealing_the_cards()
+        self.betting()
+        self.results()
+
+blackjack = Blackjack()
+blackjack.initialize()

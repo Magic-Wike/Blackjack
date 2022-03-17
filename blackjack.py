@@ -1,7 +1,7 @@
 import random
 import sys
 import os
-import random_names # for CPU players later
+# import random_names # for CPU players later
 from time import sleep
 
 # global variables 
@@ -22,7 +22,6 @@ class Deck:
     def __init__(self, num_shoes=1):
         self.cards = self.generate_deck(num_shoes)
         self.shoe_size = str(num_shoes)
-        pass
 
     def generate_deck(self, num_shoes=1):
         deck = []
@@ -65,15 +64,16 @@ class Player:
         pass
 
 
-class CPU_player:
+# class CPU_player:
 
-    def __init__(self, chip_count=random.randrange(500, 5000, 50), high_roller=False):
-        self.name = random_names.random_name()
-        self.chip_count = chip_count
-        self.high_roller = high_roller
+#     def __init__(self, chip_count=random.randrange(500, 5000, 50), high_roller=False):
+#         self.name = random_names.random_name()
+#         self.chip_count = chip_count
+#         self.high_roller = high_roller
 
 # utility functions, input handling 
 
+# clear screen 
 def clearFunc():
   if "win32" not in userOS:
     os.system('clear')
@@ -174,7 +174,7 @@ def get_bet(min=50, max=500):
             elif bet < min:
                 print("\nTable minimum is ${}".format(min))
                 continue
-            elif bet >= player1.chip_count:
+            elif bet > player1.chip_count:
                 print("\nNot enough chips. You currently have ${}".format(player1.chip_count))
                 continue
             else:
@@ -257,52 +257,51 @@ def dealer_hand(dealer_cards, dealer_card_vals):
                 return final_dealer_val
             else:
                 pass
-    else:
+    try:
+        print("\nDealer has {}".format(first_dealer_val))
+        sleep(.5)
+    except:
+        print("\nDealer has {} / {}".format(first_dealer_val[0], first_dealer_val[1]))
+        sleep(.5)
+    finally:
+        new_dealer_val = first_dealer_val
         try:
-            print("\nDealer has {}".format(first_dealer_val))
-            sleep(.5)
-        except:
-            print("\nDealer has {} / {}".format(first_dealer_val[0], first_dealer_val[1]))
-            sleep(.5)
-        finally:
-            new_dealer_val = first_dealer_val
+            high_dealer_val = max(new_dealer_val)
+        except TypeError:
+            high_dealer_val = new_dealer_val
+        while high_dealer_val < 17:
+            new_card = deck.deal_card()
+            new_val = get_card_val(new_card)
+            dealer_cards.append(new_card)
+            dealer_card_vals.append(new_val)
+            print("\nDealer draws a {}.".format(new_card)), sleep(.5)
+            new_dealer_val = sum_cards(dealer_card_vals, new_dealer_val)
             try:
-                high_dealer_val = max(new_dealer_val)
+                if 21 in new_dealer_val:
+                    print("\nOof. Dealer hits 21."), sleep(.2)
+                    return "Dealer Win"
             except TypeError:
-                high_dealer_val = new_dealer_val
-            while high_dealer_val < 17:
-                new_card = deck.deal_card()
-                new_val = get_card_val(new_card)
-                dealer_cards.append(new_card)
-                dealer_card_vals.append(new_val)
-                print("\nDealer draws a {}.".format(new_card)), sleep(.5)
-                new_dealer_val = sum_cards(dealer_card_vals, new_dealer_val)
+                if new_dealer_val == 21:
+                    print("\nOof. Dealer hits 21."), sleep(.2)
+                    return "Dealer Win"
+            try:
+                if new_dealer_val > 21:
+                    print("\nDealer busts with {}! Table win!".format(new_dealer_val)) , sleep(.5)
+                    return "Dealer Bust"
+                    
+            except TypeError:
+                if all(i>21 for i in new_dealer_val) == True:
+                    print("\nDealer busts with {}! Table win!".format(new_dealer_val)), sleep(.5)
+                    return "Dealer Bust"    
+            else:
                 try:
-                    if 21 in new_dealer_val:
-                        print("\nOof. Dealer hits 21."), sleep(.2)
-                        return "Dealer Win"
+                    print("\nDealer has {} / {}".format(new_dealer_val[0]),new_dealer_val[1])
+                    high_dealer_val = max(new_dealer_val)
                 except TypeError:
-                    if new_dealer_val == 21:
-                        print("\nOof. Dealer hits 21."), sleep(.2)
-                        return "Dealer Win"
-                try:
-                    if new_dealer_val > 21:
-                        print("\nDealer busts with {}! Table win!".format(new_dealer_val)) , sleep(.5)
-                        return "Dealer Bust"
-                        
-                except TypeError:
-                    if all(i>21 for i in new_dealer_val) == True:
-                        print("\nDealer busts with {}! Table win!".format(new_dealer_val)), sleep(.5)
-                        return "Dealer Bust"    
-                else:
-                    try:
-                        print("\nDealer has {} / {}".format(new_dealer_val[0]),new_dealer_val[1])
-                        high_dealer_val = max(new_dealer_val)
-                    except TypeError:
-                        print("\nDealer has {}.".format(new_dealer_val))
-                        high_dealer_val = new_dealer_val
-        return new_dealer_val
-    
+                    print("\nDealer has {}.".format(new_dealer_val))
+                    high_dealer_val = new_dealer_val
+    return new_dealer_val
+
 def calc_winner(final_dealer_val, final_player_val):
     print("Dealer", final_dealer_val)
     print("Player", final_player_val)
@@ -387,7 +386,6 @@ def play_hand(player_cards, player_card_vals, player_val, bet):
                 else:
                     print("\nDealing one more card! Good luck...")
                 new_player_val = hit_me(player_cards, player_card_vals, player_val, True)
-                # BUG: something wrong here, loop ends when doubling an ace value pair
                 if new_player_val in ["Bust", "Win"]:
                     if new_player_val == "Win":
                         player_win(total_bet) 
@@ -428,6 +426,8 @@ def play_hand(player_cards, player_card_vals, player_val, bet):
                         break
                     else:
                         final_player_val = ask_hit_again(player_card_vals, player_cards, new_player_val)
+                        if final_player_val in ["Win", 21]:
+                            player_win(total_bet)   
                         return final_player_val, total_bet
             else:       
                 print('\nInvalid input.')
